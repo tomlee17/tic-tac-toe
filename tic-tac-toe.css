@@ -1,0 +1,59 @@
+:root {
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+    font-style: italic;
+    font-weight: bold;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+#gridContainer {
+    display: grid;
+    background-color: burlywood;
+    width: 65vw;
+    height: 65vw;
+    max-width: 65vh;
+    max-height: 65vh;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 5px;
+    margin: auto;
+    text-align: center;
+    outline: 5px solid black;
+}
+
+.gridCell {
+    display: flex;
+    text-align: center;
+    background-color: cornflowerblue;
+    align-items: center;
+    justify-content: center;
+    color: crimson;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 5rem;
+    font-weight: bold;
+}
+
+#commentary {
+    text-align: center;
+    height: 2rem;
+    margin: 0;
+}
+
+button {
+    margin: 3em;
+    background-color: rgb(77, 224, 77);
+    padding: 1em;
+    border-radius: 1em;
+}
+
+button:hover {
+    box-shadow: inset 0 0 20px 20px rgba(108, 252, 108, 0.8);
+}
+
+#legend {
+    padding: 1em;
+    font-family: fantasy;
+}
