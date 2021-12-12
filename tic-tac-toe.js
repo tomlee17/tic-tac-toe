@@ -28,8 +28,6 @@ const player2 = playerFactory('X');
 const playerPC = playerFactory('8');
 
 const winnerProcess = (function() {
-    //gameBoard.gridCells.forEach(cell => cell.addEventListener('click', function(e) {}))
-
     const showResults = function() {
         const cellsArr = gameBoard.gridCells.map(cell => cell.textContent);
         const winMarker = winnerConditionsCheck(cellsArr);
