@@ -5,7 +5,7 @@ const gameBoard = (function() {
     const gridCell = document.createElement('div');
     gridCell.classList.add('gridCell');
 
-    for (let i = 1; i <= 9; i++) {
+    for (let i = 0; i <= 8; i++) {
         gridCell.id = `${i}`
         gridCont.appendChild(gridCell.cloneNode(true));
     }
@@ -25,53 +25,20 @@ const playerFactory = function(marker) {
 
 const player1 = playerFactory('O');
 const player2 = playerFactory('X');
+const playerPC = playerFactory('8');
 
-const displayControl = (function() {
-    let playerTrigger;
-    const commentary = document.getElementById('commentary');
-    const button = document.querySelector('button');
+const winnerProcess = (function() {
+    //gameBoard.gridCells.forEach(cell => cell.addEventListener('click', function(e) {}))
 
-    button.addEventListener('click', function(e) {
-        button.textContent = 'Restart Game';
-
-        gameBoard.gridCells.forEach(cell => {
-            cell.addEventListener('click', addMarker)
-        })
-
-        function addMarker() {
-            if (!commentary.textContent.includes('turn')) {
-                return;
-            }
-            if (!this.textContent && !playerTrigger) {
-                this.textContent = player1.marker;
-                playerTrigger = 1;
-                commentary.textContent = 'Player 2\'s turn!';
-            }
-            if (!this.textContent && playerTrigger) {
-                this.textContent = player2.marker;
-                playerTrigger = 0;
-                commentary.textContent = 'Player 1\'s turn!';
-            }
-        }
-    }, { once: true })
-
-    button.addEventListener('click', function() {
-        gameBoard.gridCells.forEach(el => el.textContent = '');
-        playerTrigger = 0;
-        commentary.textContent = 'Player 1\'s turn!';
-    })
-})();
-
-const winnerProcessor = (function() {
-    gameBoard.gridCont.addEventListener('click', function(e) {
-        const cellsArr = gameBoard.gridCells.map(function(cell) {
-            return cell.textContent;
-        })
+    const showResults = function() {
+        const cellsArr = gameBoard.gridCells.map(cell => cell.textContent);
         const winMarker = winnerConditionsCheck(cellsArr);
         if (winMarker === player1.marker) commentary.textContent = 'Player 1 wins!';
         if (winMarker === player2.marker) commentary.textContent = 'Player 2 wins!';
+        if (winMarker === playerPC.marker) commentary.textContent = 'PC wins!';
         if (winMarker === 'tie') commentary.textContent = 'Tie!';
-    })
+    }
+
     const winnerConditionsCheck = function(arr) {
         // horizontal check
         for (let i = 0; i < arr.length; i += 3) {
@@ -93,7 +60,80 @@ const winnerProcessor = (function() {
         //tie
         if (arr.every(el => el)) return 'tie';
     }
+    return {
+        showResults,
+    }
 })();
+
+const displayControl = (function() {
+    let playerTrigger;
+    let pcTriggered;
+    const commentary = document.getElementById('commentary');
+    const buttons = [...document.querySelectorAll('button')];
+    const buttonHuman = document.getElementById('human');
+    const buttonPC = document.getElementById('pc');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            gameBoard.gridCells.forEach(cell => {
+                cell.addEventListener('click', addMarker)
+            })
+        }, { once: true })
+    })
+    gameBoard.gridCont.addEventListener('click', addPcMarker);
+
+    buttons.forEach(button => button.addEventListener('click', function() {
+        button.textContent = 'Restart Game';
+        playerTrigger = 0;
+        gameBoard.gridCells.forEach(el => el.textContent = '');
+        commentary.textContent = 'Player 1\'s turn!';
+    }));
+
+    buttonHuman.addEventListener('click', function(e) {
+        buttonPC.textContent = 'Start Game vs PC';
+        pcTriggered = 0;
+    })
+
+    buttonPC.addEventListener('click', function(e) {
+        buttonHuman.textContent = 'Start Game vs Human';
+        pcTriggered = 1;
+    })
+
+    function addMarker() {
+        if (!commentary.textContent.includes('turn')) {
+            return;
+        }
+        if (!this.textContent && !playerTrigger) {
+            this.textContent = player1.marker;
+            if (!pcTriggered) {
+                playerTrigger = 'p2';
+                commentary.textContent = 'Player 2\'s turn!'
+            } else playerTrigger = 'pc';
+        }
+        if (!this.textContent && playerTrigger === 'p2') {
+            this.textContent = player2.marker;
+            playerTrigger = 0;
+            commentary.textContent = 'Player 1\'s turn!';
+        }
+        winnerProcess.showResults();
+    }
+
+    function addPcMarker() {
+        if (!commentary.textContent.includes('turn')) return;
+        if (playerTrigger === 'pc') pcRandom();
+        winnerProcess.showResults();
+    }
+
+    function pcRandom() {
+        for (let i = 0; i < 1; i++) {
+            const pcChoice = gameBoard.gridCells[Math.floor(Math.random() * 9)];
+            if (!pcChoice.textContent) pcChoice.textContent = playerPC.marker;
+            else i--;
+        }
+        playerTrigger = 0;
+    }
+})();
+
 
 /*
 1) horizontal check
